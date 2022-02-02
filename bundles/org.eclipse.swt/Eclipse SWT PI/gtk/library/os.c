@@ -273,6 +273,18 @@ JNIEXPORT void JNICALL GDK_NATIVE(gdk_1cairo_1set_1source_1window)
 }
 #endif
 
+#ifndef NO_gdk_1cairo_1surface_1create_1from_1pixbuf
+JNIEXPORT jlong JNICALL GDK_NATIVE(gdk_1cairo_1surface_1create_1from_1pixbuf)
+	(JNIEnv *env, jclass that, jlong arg0, jint arg1, jlong arg2)
+{
+	jlong rc = 0;
+	GDK_NATIVE_ENTER(env, that, gdk_1cairo_1surface_1create_1from_1pixbuf_FUNC);
+	rc = (jlong)gdk_cairo_surface_create_from_pixbuf((const GdkPixbuf *)arg0, (int)arg1, (GdkWindow *)arg2);
+	GDK_NATIVE_EXIT(env, that, gdk_1cairo_1surface_1create_1from_1pixbuf_FUNC);
+	return rc;
+}
+#endif
+
 #ifndef NO_gdk_1clipboard_1set_1content
 JNIEXPORT jlong JNICALL GDK_NATIVE(gdk_1clipboard_1set_1content)
 	(JNIEnv *env, jclass that, jlong arg0, jlong arg1)
@@ -337,6 +349,18 @@ JNIEXPORT jlong JNICALL GDK_NATIVE(gdk_1cursor_1new_1from_1pixbuf)
 	GDK_NATIVE_ENTER(env, that, gdk_1cursor_1new_1from_1pixbuf_FUNC);
 	rc = (jlong)gdk_cursor_new_from_pixbuf((GdkDisplay *)arg0, (GdkPixbuf *)arg1, (gint)arg2, (gint)arg3);
 	GDK_NATIVE_EXIT(env, that, gdk_1cursor_1new_1from_1pixbuf_FUNC);
+	return rc;
+}
+#endif
+
+#ifndef NO_gdk_1cursor_1new_1from_1surface
+JNIEXPORT jlong JNICALL GDK_NATIVE(gdk_1cursor_1new_1from_1surface)
+	(JNIEnv *env, jclass that, jlong arg0, jlong arg1, jdouble arg2, jdouble arg3)
+{
+	jlong rc = 0;
+	GDK_NATIVE_ENTER(env, that, gdk_1cursor_1new_1from_1surface_FUNC);
+	rc = (jlong)gdk_cursor_new_from_surface((GdkDisplay *)arg0, (cairo_surface_t *)arg1, (gdouble)arg2, (gdouble)arg3);
+	GDK_NATIVE_EXIT(env, that, gdk_1cursor_1new_1from_1surface_FUNC);
 	return rc;
 }
 #endif

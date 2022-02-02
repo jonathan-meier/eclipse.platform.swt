@@ -16,6 +16,7 @@ package org.eclipse.swt.graphics;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.internal.*;
+import org.eclipse.swt.internal.cairo.*;
 import org.eclipse.swt.internal.gtk.*;
 
 /**
@@ -342,13 +343,7 @@ public Cursor(Device device, ImageData source, int hotspotX, int hotspotY) {
 	}
 	C.memmove(data, buffer, stride * height);
 
-	if (GTK.GTK4) {
-		long texture = GDK.gdk_texture_new_for_pixbuf(pixbuf);
-		handle = GDK.gdk_cursor_new_from_texture(texture, hotspotX, hotspotY, 0);
-		OS.g_object_unref(texture);
-	} else {
-		handle = GDK.gdk_cursor_new_from_pixbuf(display, pixbuf, hotspotX, hotspotY);
-	}
+	handle = createCursorFromPixbuf(pixbuf, hotspotX, hotspotY)
 	OS.g_object_unref(pixbuf);
 
 	if (handle == 0) SWT.error(SWT.ERROR_NO_HANDLES);
@@ -410,16 +405,30 @@ long createCursor(byte[] sourceData, byte[] maskData, int width, int height, int
 	long pixels = GDK.gdk_pixbuf_get_pixels(pixbuf);
 	C.memmove(pixels, data, stride * height);
 
+	long cursor = createCursorFromPixbuf(pixbuf, hotspotX, hotspotY);
+	OS.g_object_unref(pixbuf);
+
+	return cursor;
+}
+
+private long createCursorFromPixbuf(long pixbuf, int hotspotX, int hotspotY) {
 	long cursor;
 	if (GTK.GTK4) {
 		long texture = GDK.gdk_texture_new_for_pixbuf(pixbuf);
 		cursor = GDK.gdk_cursor_new_from_texture(texture, hotspotX, hotspotY, 0);
 		OS.g_object_unref(texture);
-	} else {
-		cursor = GDK.gdk_cursor_new_from_pixbuf(GDK.gdk_display_get_default(), pixbuf, hotspotX, hotspotY);
 	}
-	OS.g_object_unref(pixbuf);
-
+	else {
+		int deviceZoom = DPIUtil.getDeviceZoom();
+		if (DPIUtil.useCairoAutoScale() && deviceZoom > 100) {
+			long surface = GDK.gdk_cairo_surface_create_from_pixbuf(pixbuf, deviceZoom / 100, 0);
+			cursor = GDK.gdk_cursor_new_from_surface(GDK.gdk_display_get_default(), surface, hotspotX * 100 / deviceZoom, hotspotY * 100 / deviceZoom);
+			Cairo.cairo_surface_destroy(surface);
+		}
+		else {
+			cursor = GDK.gdk_cursor_new_from_pixbuf(GDK.gdk_display_get_default(), pixbuf, hotspotX, hotspotY);
+		}
+	}
 	return cursor;
 }
 

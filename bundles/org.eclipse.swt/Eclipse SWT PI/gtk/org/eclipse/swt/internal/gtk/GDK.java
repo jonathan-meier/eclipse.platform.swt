@@ -363,6 +363,13 @@ public class GDK extends OS {
 	/* [GTK4 only, if-def'd in os.h] */
 	public static final native void gdk_surface_set_opaque_region(long surface, long region);
 	/**
+	 * @param pixbuf cast=(const GdkPixbuf *)
+	 * @param scale cast=int
+	 * @param window cast=(GdkWindow *)
+	 */
+	/* [GTK3 only, if-def'd in os.h] */
+	public static final native long gdk_cairo_surface_create_from_pixbuf(long pixbuf, int scale, long window);
+	/**
 	 * @param cairo cast=(cairo_t *)
 	 * @param pixbuf cast=(const GdkPixbuf *)
 	 * @param pixbuf_x cast=(gdouble)
@@ -392,6 +399,14 @@ public class GDK extends OS {
 	 * @param y cast=(gint)
 	 */
 	public static final native long gdk_cursor_new_from_pixbuf(long display, long pixbuf, int x, int y);
+	/**
+	 * @param display cast=(GdkDisplay *)
+	 * @param surface cast=(cairo_surface_t *)
+	 * @param x cast=(gdouble)
+	 * @param y cast=(gdouble)
+	 */
+	/* [GTK3 only, if-def'd in os.h] */
+	public static final native long gdk_cursor_new_from_surface(long display, long surface, double x, double y);
 
 	/* GdkCursor [GTK4 only] */
 	/**

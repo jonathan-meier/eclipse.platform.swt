@@ -213,6 +213,7 @@
 #define NO_gdk_1window_1show_1unraised
 #define NO_gdk_1window_1set_1background_1pattern
 #define NO_gdk_1event_1get_1window
+#define NO_gdk_1cairo_1surface_1create_1from_1pixbuf
 
 // GdkDragContext removals
 #define NO_gdk_1drag_1context_1get_1dest_1window
@@ -242,6 +243,7 @@
 #define NO_gdk_1cursor_1new_1for_1display
 #define NO_gdk_1cursor_1new_1from_1pixbuf
 #define NO_gdk_1cursor_1new_1from_1name__JLjava_lang_String_2
+#define NO_gdk_1cursor_1new_1from_1surface
 
 // GdkKeymap removals
 #define NO_gdk_1keymap_1translate_1keyboard_1state
