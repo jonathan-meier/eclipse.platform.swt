@@ -1334,8 +1334,6 @@ void drawBitmapAlpha(Image srcImage, int srcX, int srcY, int srcWidth, int srcHe
 
 	/* Get the foreground pixels */
 	OS.BitBlt(memHdc, 0, 0, srcWidth, srcHeight, srcHdc, srcX, srcY, OS.SRCCOPY);
-	byte[] srcData = new byte[sizeInBytes];
-	OS.MoveMemory(srcData, dibBM.bmBits, sizeInBytes);
 
 	/*
 	* When drawing to a printer, StretchBlt does not correctly stretch if
@@ -1365,6 +1363,7 @@ void drawBitmapAlpha(Image srcImage, int srcX, int srcY, int srcWidth, int srcHe
 			OS.BitBlt(memHdc, 0, 0, destWidth, destHeight, memHdc, 0, 0, OS.SRCCOPY);
 		}
 	}
+	byte[] srcData = new byte[sizeInBytes];
 	OS.MoveMemory(srcData, dibBM.bmBits, sizeInBytes);
 
 	/* Compose the pixels */
