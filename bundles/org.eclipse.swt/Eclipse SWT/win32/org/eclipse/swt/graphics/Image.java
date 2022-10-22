@@ -1576,6 +1576,16 @@ public ImageData getImageDataAtCurrentZoom() {
 				OS.MoveMemory(data, bm.bmBits, imageSize);
 			} else {
 				OS.GetDIBits(hBitmapDC, handle, 0, height, data, bmi, OS.DIB_RGB_COLORS);
+//				if (depth == 32) {
+//					byte[] newData = new byte[3 * width * height];
+//					for (int np = 0, op = 0; np < newData.length; np += 3, op += 4) {
+//						newData[np    ] = data[op];
+//						newData[np + 1] = data[op + 1];
+//						newData[np + 2] = data[op + 2];
+//					}
+//					data = newData;
+//					depth = 24;
+//				}
 			}
 			/* Calculate the palette */
 			PaletteData palette = null;

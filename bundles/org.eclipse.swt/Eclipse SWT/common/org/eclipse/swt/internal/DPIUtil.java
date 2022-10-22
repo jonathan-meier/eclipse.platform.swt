@@ -242,6 +242,7 @@ private static ImageData autoScaleImageData (Device device, final ImageData imag
 		Image resultImage = new Image (device, (ImageDataProvider) zoom -> resultData);
 		GC gc = new GC (resultImage);
 		gc.setAntialias (SWT.ON);
+		gc.setInterpolation(SWT.HIGH);
 		gc.drawImage (original, 0, 0, DPIUtil.autoScaleDown (width), DPIUtil.autoScaleDown (height),
 				/* E.g. destWidth here is effectively DPIUtil.autoScaleDown (scaledWidth), but avoiding rounding errors.
 				 * Nevertheless, we still have some rounding errors due to the point-based API GC#drawImage(..).

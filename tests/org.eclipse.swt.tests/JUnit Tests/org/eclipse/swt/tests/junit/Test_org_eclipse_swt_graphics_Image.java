@@ -1123,4 +1123,121 @@ public void test_bug566545_efficientGrayscaleImage() {
 	outImageDirect.dispose();
 }
 
+@Test
+public void test_bug493455() {
+	ImageData imageData = getTestImageData();
+	int width = imageData.width;
+	int height = imageData.height;
+
+	Image image = new Image(display, imageData);
+
+	ImageData outImageData = new ImageData(width, height, 24, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+	outImageData.alphaData = new byte[width * height];
+	Image outImage = new Image(display, outImageData);
+
+	GC gc = new GC(outImage);
+	gc.drawImage(image, 0, 0);
+	gc.dispose();
+
+	ImageTestUtil.assertImagesEqual(convertToPremultipliedAlpha(imageData), convertToPremultipliedAlpha(outImage.getImageData()));
+
+	image.dispose();
+	outImage.dispose();
+}
+
+ImageData convertToPremultipliedAlpha(ImageData imageData) {
+	ImageData resultImageData = imageData.clone();
+	byte[] pixelData = resultImageData.data;
+	byte[] alphaData = resultImageData.alphaData;
+	int step = resultImageData.depth / 8;
+	for (int dp = 0, ap = 0; dp < pixelData.length; dp += step, ap++) {
+		int alpha = alphaData[ap] & 0xFF;
+		if (alpha != 0) {
+			int r = ((pixelData[dp    ] & 0xFF) * alpha) + 128;
+			r = (r + (r >> 8)) >> 8;
+			int g = ((pixelData[dp + 1] & 0xFF) * alpha) + 128;
+			g = (g + (g >> 8)) >> 8;
+			int b = ((pixelData[dp + 2] & 0xFF) * alpha) + 128;
+			b = (b + (b >> 8)) >> 8;
+			pixelData[dp    ] = (byte) r;
+			pixelData[dp + 1] = (byte) g;
+			pixelData[dp + 2] = (byte) b;
+		}
+	}
+	return resultImageData;
+
+}
+
+@Test
+public void test_bug493455_regression() {
+	ImageData imageData = getTestImageData();
+	int width = imageData.width;
+	int height = imageData.height;
+
+	ImageData expectedImageData = new ImageData(width, height, 32, new PaletteData(0xFF00, 0xFF0000, 0xFF000000));
+
+	byte[] pixelData = imageData.data;
+	byte[] alphaData = imageData.alphaData;
+	byte[] expectedPixelData = new byte[4 * width * height];
+	for (int ep = 0, dp = 0, ap = 0; ap < alphaData.length; ep += 4, dp += 3, ap++) {
+		int alpha = alphaData[ap] & 0xFF;
+		expectedPixelData[ep    ] = (byte) ((255 - alpha) + (alpha * (pixelData[dp    ] & 0xFF) + 127) / 255);
+		expectedPixelData[ep + 1] = (byte) ((255 - alpha) + (alpha * (pixelData[dp + 1] & 0xFF) + 127) / 255);
+		expectedPixelData[ep + 2] = (byte) ((255 - alpha) + (alpha * (pixelData[dp + 2] & 0xFF) + 127) / 255);
+		expectedPixelData[ep + 3] = (byte) 255;
+	}
+
+	expectedImageData = new ImageData(width, height, 32, new PaletteData(0xFF00, 0xFF0000, 0xFF000000), 4, expectedPixelData);
+
+	Image image = new Image(display, imageData);
+	Image intermediateImage = new Image(display, width, height);
+
+	GC gc = new GC(intermediateImage);
+	gc.drawImage(image, 0, 0);
+	gc.dispose();
+
+	ImageData outImageData = new ImageData(width, height, 24, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+	outImageData.alphaData = new byte[width * height];
+	Image outImage = new Image(display, outImageData);
+	gc = new GC(outImage);
+	gc.drawImage(intermediateImage, 0, 0);
+	gc.dispose();
+
+	ImageTestUtil.assertImagesEqual(expectedImageData, outImage.getImageData());
+
+	image.dispose();
+	intermediateImage.dispose();
+	outImage.dispose();
+}
+
+ImageData getTestImageData() {
+	int bpp = 3;
+	int width = 64;
+	int height = 64;
+	ImageData imageData = new ImageData(width, height, bpp * 8, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+	imageData.alphaData = new byte[width * height];
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			for (int k = 0; k < 8; k++) {
+				for (int l = 0; l < 8; l++) {
+					int x = i * 8 + j;
+					int y = k * 8 + l;
+					int o = x * 64 + y;
+					int a = 255 * i / 7;
+					int r = 255 * j / 7;
+					int g = 255 * k / 7;
+					int b = 255 * l / 7;
+					if (a != 0) {
+						imageData.data[bpp * o    ] = (byte) r;
+						imageData.data[bpp * o + 1] = (byte) g;
+						imageData.data[bpp * o + 2] = (byte) b;
+						imageData.alphaData[o] = (byte) a;
+					}
+				}
+			}
+		}
+	}
+	return imageData;
+}
+
 }

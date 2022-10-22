@@ -4482,6 +4482,7 @@ public void setInterpolation(int interpolation) {
 		case SWT.NONE: mode = Gdip.InterpolationModeNearestNeighbor; break;
 		case SWT.LOW: mode = Gdip.InterpolationModeLowQuality; break;
 		case SWT.HIGH: mode = Gdip.InterpolationModeHighQuality; break;
+//		case SWT.HIGH: mode = Gdip.InterpolationModeHighQualityBicubic; break;
 		default:
 			SWT.error(SWT.ERROR_INVALID_ARGUMENT);
 	}
